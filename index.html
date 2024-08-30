@@ -4,10 +4,29 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/goit-js-hw-12/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/2.0.0/modern-normalize.min.css"
+    />
     <title>Gallery</title>
     <script type="module" crossorigin src="/goit-js-hw-12/index.js"></script>
-    <link rel="stylesheet" crossorigin href="/goit-js-hw-12/assets/index-B9kkWxtF.css">
+    <link rel="modulepreload" crossorigin href="/goit-js-hw-12/assets/vendor-DOgVoBmD.js">
+    <link rel="stylesheet" crossorigin href="/goit-js-hw-12/assets/vendor-DumFYO8Z.css">
+    <link rel="stylesheet" crossorigin href="/goit-js-hw-12/assets/index-CUB5LNUF.css">
   </head>
   <body>
+    <section class="gallery-section">
+      <div class="container">
+        <form class="form" >
+          <input class="search-input" type="text" name="search_query" />
+          <button class="search-btn" type="submit">Search</button>
+        </form>
+        <ul class="gallery"></ul>
+        <span class="loader"></span>
+    
+        <button type="button" class="load-btn is-hidden">Load more</button>
+      </div>
+    </section>
+
   </body>
 </html>
