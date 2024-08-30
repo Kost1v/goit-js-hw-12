@@ -4,10 +4,27 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/2.0.0/modern-normalize.min.css"
+    />
     <title>Gallery</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
-    <script type="module" src="main.js"></script>
+    <section class="gallery-section">
+      <div class="container">
+        <form class="form" >
+          <input class="search-input" type="text" name="search_query" />
+          <button class="search-btn" type="submit">Search</button>
+        </form>
+        <ul class="gallery"></ul>
+        <span class="loader"></span>
+    
+        <button type="button" class="load-btn is-hidden">Load more</button>
+      </div>
+    </section>
+
+    <script type="module" src="./main.js"></script>
   </body>
 </html>
