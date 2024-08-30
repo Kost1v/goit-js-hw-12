@@ -1,7 +1,5 @@
 import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
 
 import { fetchPhotos } from './js/pixabay-api';
 import { createGalleryCard } from './js/render-functions';
@@ -9,16 +7,24 @@ import { createGalleryCard } from './js/render-functions';
 const form = document.querySelector('.form');
 const gallery = document.querySelector('.gallery');
 const loader = document.querySelector('.loader');
-const loadBtn = document.querySelector('.load-btn');
+const loadMoreBtn = document.querySelector('.load-btn');
 
 let currentPage = 1;
 let searchQuery = '';
+let totalHits = 0;
+let loadedHits = 0;
+let largeImage = new SimpleLightbox('.gallery-link', {
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 
 const searchPhoto = async event => {
   try {
     event.preventDefault();
 
-    if (form.firstElementChild.value.trim() == '') {
+    searchQuery = form.elements.search_query.value.trim();
+
+    if (searchQuery == '') {
       iziToast.warning({
         title: '',
         message: `Введи запит на пошук`,
@@ -28,13 +34,12 @@ const searchPhoto = async event => {
       return;
     }
 
-    searchQuery = form.elements.search_query.value;
     currentPage = 1;
+    totalHits = 0;
+    loadedHits = 0;
     loader.classList.add('is-load');
 
     const response = await fetchPhotos(searchQuery, currentPage);
-
-    console.log(response);
 
     if (response.data.hits.length === 0) {
       iziToast.error({
@@ -45,29 +50,36 @@ const searchPhoto = async event => {
       });
 
       loader.classList.remove('is-load');
-      loadBtn.classList.add('is-hidden');
+      loadMoreBtn.classList.add('is-hidden');
       gallery.innerHTML = '';
       form.reset();
 
       return;
     }
 
+    totalHits = response.data.totalHits;
+    loadedHits = response.data.hits.length;
+
     const galleryCards = response.data.hits
       .map(cardInfo => createGalleryCard(cardInfo))
       .join('');
 
     gallery.innerHTML = galleryCards;
+    largeImage.refresh();
+
+    if (loadedHits < totalHits) {
+      loadMoreBtn.classList.remove('is-hidden');
+    } else {
+      iziToast.info({
+        title: '',
+        message: `"We're sorry, but you've reached the end of search results."`,
+        messageSize: '18',
+        position: 'topRight',
+      });
+      loadMoreBtn.classList.add('is-hidden');
+    }
 
     loader.classList.remove('is-load');
-    loadBtn.classList.remove('is-hidden');
-
-    let largeImage = new SimpleLightbox('.gallery-link', {
-      captionsData: 'alt',
-      captionDelay: 250,
-    });
-
-    largeImage.on('show.simplelightbox');
-
     form.reset();
     return;
   } catch (err) {
@@ -77,38 +89,40 @@ const searchPhoto = async event => {
 
 const loadMoreBtnClick = async event => {
   try {
-    event.preventDefault();
     currentPage++;
     loader.classList.add('is-load');
 
     const response = await fetchPhotos(searchQuery, currentPage);
+
+    loadedHits += response.data.hits.length;
 
     const galleryCards = response.data.hits
       .map(cardInfo => createGalleryCard(cardInfo))
       .join('');
 
     gallery.insertAdjacentHTML('beforeend', galleryCards);
+    largeImage.refresh();
     loader.classList.remove('is-load');
 
     scrollBy({
       top: 640,
       behavior: 'smooth',
     });
-    console.log(currentPage);
 
-    if (response.data.hits.length === 0) {
-      loadBtn.classList.add('is-hidden');
+    if (loadedHits >= totalHits) {
       iziToast.info({
         title: '',
         message: `"We're sorry, but you've reached the end of search results."`,
         messageSize: '18',
         position: 'topRight',
       });
+      loadMoreBtn.classList.add('is-hidden');
     }
+
   } catch (err) {
     console.log(err);
   }
 };
 
 form.addEventListener('submit', searchPhoto);
-loadBtn.addEventListener('click', loadMoreBtnClick);
+loadMoreBtn.addEventListener('click', loadMoreBtnClick);
